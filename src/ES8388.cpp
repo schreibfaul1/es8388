@@ -146,12 +146,13 @@ bool ES8388::begin(int sda, int scl, uint32_t frequency)
         res &= write_reg(ES8388_ADDR, ES8388_DACPOWER, 0x3c);
         res &= write_reg(ES8388_ADDR, ES8388_DACCONTROL3, 0x00);
         res &= write_reg(ES8388_ADDR, ES8388_ADCPOWER, 0x00);
-        
+
         /* set up MCLK) */
-		PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+        #ifdef FUNC_GPIO0_CLK_OUT1
+		    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+        #endif
         WRITE_PERI_REG(PIN_CTRL, 0xFFF0);
     }
-
     return res;
 }
 
@@ -237,6 +238,18 @@ void ES8388::volume(const ES8388_OUT out, const uint8_t vol)
 
     write_reg(ES8388_ADDR, lreg, vol_val);
     write_reg(ES8388_ADDR, rreg, vol_val);
+}
+
+void ES8388::SetVolumeSpeaker(uint8_t vol) {
+    vol = vol * 1.6;
+    volume(ES_OUT1, vol);
+    volume(ES_MAIN, 100);
+}
+
+void ES8388::SetVolumeHeadphone(uint8_t vol){
+    vol = vol * 1.6;
+    volume(ES_OUT2, vol);
+    volume(ES_MAIN, 100);    
 }
 
 /**
